@@ -6,7 +6,7 @@ public class TurretShot : MonoBehaviour
 {
     public GameObject BulletPrefab;
     
-    public Transform Player;
+    public Transform Target;
     private float TotalTime;
     public bool IsTurret = false; 
     // Start is called before the first frame update
@@ -18,7 +18,7 @@ public class TurretShot : MonoBehaviour
         {
             TotalTime = 0f;
             GameObject bullet = Instantiate(BulletPrefab, transform.position,transform.rotation);
-            bullet.transform.LookAt(Player);
+            bullet.transform.LookAt(Target);
 
         }
 
@@ -26,10 +26,13 @@ public class TurretShot : MonoBehaviour
 
     private void OnTriggerStay(Collider other)
     {
-        if (other.tag == "Player")
+        
+        if (other.tag == "Player") // Player 발견시 타켓 지정
         {
+            
             IsTurret = true;
         }
+
     }
 
     private void OnTriggerExit(Collider other)
@@ -45,16 +48,22 @@ public class TurretShot : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(IsTurret)
+        Vector3 distanceVector = Target.position - transform.position;
+       float Range = Vector3.Dot(transform.forward, distanceVector.normalized); //사이값
+
+        Vector3 Cross = Vector3.Cross(transform.forward, distanceVector.normalized);
+       
+        if(Cross.y < 0f && Range > 0f)
         {
-            transform.LookAt(Player);
-            BulletShot();
-        }
-        else
-        {
-            transform.Rotate(0f, 1f, 0f);
             
+            if (IsTurret)
+            {
+                transform.LookAt(Target);
+                BulletShot();
+            }
+
         }
+       
 
     }
 
